@@ -16,7 +16,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-from to_do_list.db import Base
+from to_do_list.model import Base, Task
 target_metadata = Base.metadata
 # target_metadata = None
 
