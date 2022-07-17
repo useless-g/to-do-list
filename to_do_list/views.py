@@ -30,10 +30,10 @@ def load_new_task(item: NewTask, db: Session = Depends(get_db)):
 @router.get('/{pk}', response_model=OldTask)
 def get_task(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
     task = db.query(Task).get(pk)
-    return task if task else Response(content='wrong id', status_code=404)  # todo: make right responses for each endpoint
+    return task if task else Response(status_code=404)  # todo: make right responses for each endpoint
 
 
-@router.patch('/mark')
+@router.patch('/mark/{pk}')
 def mark_as_done(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
     if db.query(Task).filter(Task.id == pk).update({Task.done: True}, synchronize_session='evaluate'):
         db.commit()
@@ -42,9 +42,9 @@ def mark_as_done(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
         return {'there are no task with this id': pk}
 
 
-@router.delete('/delete_task')
+@router.delete('/delete_task/{pk}')
 def delete_task(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
-    if db.query(Task).filter(Task.id == pk).delete(synchronize_session='evaluate'):
+    if db.query(Task).filter(Task.id == pk).delete(synchronize_session=False):
         db.commit()
         return {'task deleted': pk}
     else:
