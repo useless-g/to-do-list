@@ -1,16 +1,22 @@
-from typing import List
-from fastapi import APIRouter, Depends, Request, Path
+from copy import deepcopy
+from typing import List, Union
+from fastapi import APIRouter, Depends, Request, Path, HTTPException
 from sqlalchemy.orm import Session
-from starlette.responses import Response
-
+from starlette import status
 from model import Task
-from schema import NewTask, OldTask
+from schema import *
 
 router = APIRouter()
 
 
 def get_db(request: Request):
     return request.state.db
+
+
+def wrong_id():
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                        detail=[{"loc": ["path", "pk"],
+                                 "msg": "no tasks with this id"}])
 
 
 @router.get('/', response_model=List[OldTask])
@@ -27,25 +33,29 @@ def load_new_task(item: NewTask, db: Session = Depends(get_db)):
     return task
 
 
-@router.get('/{pk}', response_model=OldTask)
+@router.get('/{pk}', response_model=Union[OldTask, WrongId])
 def get_task(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
     task = db.query(Task).get(pk)
-    return task if task else Response(status_code=404)  # todo: make right responses for each endpoint
+    if task:
+        return task
+    wrong_id()
 
 
-@router.patch('/mark/{pk}')
+@router.patch('/mark/{pk}', response_model=Union[OldTask, WrongId])
 def mark_as_done(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
-    if db.query(Task).filter(Task.id == pk).update({Task.done: True}, synchronize_session='evaluate'):
+    task = db.query(Task).get(pk)
+    if task:
+        db.query(Task).filter(Task.id == pk).update({Task.done: True}, synchronize_session='evaluate')
         db.commit()
-        return {'task marked as done': pk}
-    else:
-        return {'there are no task with this id': pk}
+        return task
+    wrong_id()
 
 
-@router.delete('/delete_task/{pk}')
+@router.delete('/delete_task/{pk}', response_model=Union[OldTask, WrongId])
 def delete_task(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
-    if db.query(Task).filter(Task.id == pk).delete(synchronize_session=False):
+    task = deepcopy(db.query(Task).get(pk))
+    if task:
+        db.query(Task).filter(Task.id == pk).delete(synchronize_session=False)
         db.commit()
-        return {'task deleted': pk}
-    else:
-        return {'there are no task with this id': pk}
+        return task
+    wrong_id()
