@@ -4,12 +4,9 @@ from fastapi import APIRouter, Depends, Request, Path, HTTPException, status
 from sqlalchemy.orm import Session
 from model import Task
 from schema import *
+from db import Base
 
 router = APIRouter()
-
-
-def get_db(request: Request):
-    return request.state.db
 
 
 def wrong_id():
@@ -19,42 +16,41 @@ def wrong_id():
 
 
 @router.get('/', response_model=List[OldTask])
-def get_all_tasks(db: Session = Depends(get_db)):
-    return db.query(Task).all()
+async def get_all_tasks():
+    query = Task.select()
+    return await Base.fetch_all(query)
 
 
 @router.post('/add_task', status_code=status.HTTP_201_CREATED, response_model=NewTask)
-def load_new_task(item: NewTask, db: Session = Depends(get_db)):
-    task = Task(**item.dict())
-    db.add(task)
-    db.commit()
-    db.refresh(task)
-    return task
+async def load_new_task(item: NewTask):
+    query = Task.insert().values(**item.dict())
+    await Base.execute(query)
+    return item
 
 
 @router.get('/{pk}', response_model=Union[OldTask, WrongId])
-def get_task(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
-    task = db.query(Task).get(pk)
+async def get_task(pk: int = Path(..., gt=0)):
+    task = await Base.fetch_one(query=Task.select().where(Task.c.id == pk))
     if task:
         return task
     wrong_id()
 
 
 @router.patch('/mark/{pk}', response_model=Union[OldTask, WrongId])
-def mark_as_done(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
-    task = db.query(Task).get(pk)
+async def mark_as_done(pk: int = Path(..., gt=0)):
+    task = await Base.fetch_one(query=Task.select().where(Task.c.id == pk))
     if task:
-        db.query(Task).filter(Task.id == pk).update({Task.done: True}, synchronize_session='evaluate')
-        db.commit()
+        query = Task.update().where(Task.c.id == pk).values(done=True)
+        await Base.execute(query)
         return task
     wrong_id()
 
 
-@router.delete('/delete_task/{pk}', response_model=Union[OldTask, WrongId])
-def delete_task(pk: int = Path(..., gt=0), db: Session = Depends(get_db)):
-    task = deepcopy(db.query(Task).get(pk))
+@router.delete('/delete_task/{pk}', response_model=TaskDeleted)
+async def delete_task(pk: int = Path(..., gt=0)):
+    task = await Base.fetch_one(query=Task.select().where(Task.c.id == pk))
     if task:
-        db.query(Task).filter(Task.id == pk).delete(synchronize_session=False)
-        db.commit()
-        return task
+        query = Task.delete().where(Task.c.id == pk)
+        await Base.execute(query)
+        return {'detail': "task deleted"}
     wrong_id()

@@ -1,12 +1,15 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Text, Date, Boolean, MetaData, Table
 
 from db import Base
 
+metadata = MetaData()
 
-class Task(Base):
-    __tablename__ = 'tasks'
-    id = Column(Integer, primary_key=True, index=True, unique=True)
-    title = Column(String, nullable=False)
-    text = Column(Text, nullable=True)
-    date = Column(DateTime, nullable=False)
-    done = Column(Boolean, default=False)
+Task = Table(
+    'tasks',
+    metadata,
+    Column('id', Integer, primary_key=True, index=True, unique=True),
+    Column('title', String, nullable=False),
+    Column('text', Text, nullable=True),
+    Column('deadline', Date, nullable=False),
+    Column('done', Boolean, default=False),
+)
