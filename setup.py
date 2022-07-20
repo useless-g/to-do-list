@@ -6,7 +6,7 @@ setup(
     packages=['to_do_list'],
     url='',
     license='',
-    author='Sergeus',
+    author='Serg',
     author_email='uzellessmovic@gmail.com',
     description='todo list'
 )

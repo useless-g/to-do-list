@@ -1,8 +1,7 @@
 from copy import deepcopy
 from typing import List, Union
-from fastapi import APIRouter, Depends, Request, Path, HTTPException
+from fastapi import APIRouter, Depends, Request, Path, HTTPException, status
 from sqlalchemy.orm import Session
-from starlette import status
 from model import Task
 from schema import *
 
@@ -24,7 +23,7 @@ def get_all_tasks(db: Session = Depends(get_db)):
     return db.query(Task).all()
 
 
-@router.post('/add_task', response_model=NewTask)
+@router.post('/add_task', status_code=status.HTTP_201_CREATED, response_model=NewTask)
 def load_new_task(item: NewTask, db: Session = Depends(get_db)):
     task = Task(**item.dict())
     db.add(task)
