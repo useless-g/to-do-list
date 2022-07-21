@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request, Response
 from .db import Base
-
 from .views import router
 
 app = FastAPI()
