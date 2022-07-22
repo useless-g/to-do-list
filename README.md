@@ -6,6 +6,8 @@ Stack: FastAPI, sqlalchemy, postgresql, databases, alembic, pydantic, pytest
 
 Install (Windows)
 =================
+first, install and run postresql server
+
 pip install virtualenv
 
 virtualenv env
