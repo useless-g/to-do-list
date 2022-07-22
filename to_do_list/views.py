@@ -3,8 +3,6 @@ from fastapi import APIRouter, Depends, Request, Path, HTTPException, status
 from .model import Task
 from .schema import *
 from .db import Base
-from fastapi import APIRouter, Depends, Request, Path, HTTPException
-from starlette import status
 
 
 router = APIRouter()

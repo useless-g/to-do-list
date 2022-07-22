@@ -1,7 +1,7 @@
 from databases import Database
 from sqlalchemy import create_engine
 
-TESTING = True
+TESTING = False
 SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123@localhost/to_do"
 TEST_DATABASE_URL = "postgresql://postgres:123@localhost/test_to_do"
 
