@@ -1,7 +1,5 @@
-from copy import deepcopy
 from typing import List, Union
 from fastapi import APIRouter, Depends, Request, Path, HTTPException, status
-from sqlalchemy.orm import Session
 from .model import Task
 from .schema import *
 from .db import Base
@@ -54,8 +52,3 @@ async def delete_task(pk: int = Path(..., gt=0)):
         await Base.execute(query)
         return {'detail': "task deleted"}
     wrong_id()
-
-
-@router.get('/test')
-async def some():
-    return{"": ""}
