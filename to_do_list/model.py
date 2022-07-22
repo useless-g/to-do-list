@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, Date, Boolean, MetaData, Table
 
 metadata = MetaData()
-from .db import Base
-
 
 Task = Table(
     'tasks',
