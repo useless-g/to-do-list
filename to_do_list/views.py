@@ -40,7 +40,9 @@ async def mark_as_done(pk: int = Path(..., gt=0)):
     if task:
         query = Task.update().where(Task.c.id == pk).values(done=True)
         await Base.execute(query)
-        return task
+        response = dict(**task)
+        response['done'] = True
+        return response
     wrong_id()
 
 

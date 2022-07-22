@@ -1,8 +1,8 @@
-"""make id integer
+"""first
 
-Revision ID: 2be31467362d
-Revises: d86ae8a4f11b
-Create Date: 2022-07-20 12:47:23.940338
+Revision ID: 58c6f060d716
+Revises: 058eb9107786
+Create Date: 2022-07-22 13:45:42.102569
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2be31467362d'
-down_revision = 'd86ae8a4f11b'
+revision = '58c6f060d716'
+down_revision = '058eb9107786'
 branch_labels = None
 depends_on = None
 
