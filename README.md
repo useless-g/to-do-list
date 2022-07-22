@@ -6,6 +6,8 @@ Stack: FastAPI, sqlalchemy, postgresql, databases, alembic, pydantic, pytest
 
 Install (Windows)
 =================
+first, install and run postresql server
+
 pip install virtualenv
 
 virtualenv env
@@ -20,16 +22,37 @@ uvicorn to_do_list.main:app --port 8000
 
 Install (linux)
 ===============
+sudo apt update
 
-pip install virtualenv
+sudo apt install postgresql postgresql-contrib
 
-virtualenv env
+sudo systemctl start postgresql.service
+
+sudo -i -u postgres
+
+\password postgres
+
+123
+
+123
+
+\q
+
+exit
+
+sudo apt install python3-virtualenv
+
+sudo apt install python3.8-venv
+
+python3 -m venv ./env
 
 source ./env/bin/activate
 
 git clone https://github.com/useless-g/to-do-list/
 
-cd to-do-list
+cd to-do-list/
+
+sudo apt install pip
 
 pip install -r requirements.txt
 
